@@ -10,7 +10,9 @@ export const Index: FC<{
     [items]
   );
   return (
-    <div className="text-white flex font-mono font-light">{menuComponents}</div>
+    <div className="text-white flex font-mono font-light z-50">
+      {menuComponents}
+    </div>
   );
 };
 
