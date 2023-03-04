@@ -1,0 +1,4 @@
+.menu-item:hover + .submenu, .submenu:hover {
+  display: block;
+  top: 100%;
+}
