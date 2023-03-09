@@ -1,9 +1,7 @@
-import logo from "../../assets/ai.svg";
-
 export const Index = () => {
   return (
     <img
-      src={logo}
+      src="/ai.svg"
       className="h-full aspect-square p-3 border-content"
       title="al logo"
     />
