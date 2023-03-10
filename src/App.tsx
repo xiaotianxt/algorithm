@@ -1,5 +1,5 @@
 import Header from "./Header";
-import Playground from "./components/Playground";
+import Playground from "./components/Playground/Scene";
 
 function App() {
   return (

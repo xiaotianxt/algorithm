@@ -15,4 +15,5 @@ export const menu: Menu[] = [
   { name: MENU_NAME.CONFIG, children: [] },
 ];
 
+export const LEFT_MOUSE_BUTTON = 0;
 export const RIGHT_MOUSE_BUTTON = 2;
