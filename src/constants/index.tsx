@@ -6,12 +6,18 @@ export enum MENU_NAME {
 }
 
 export enum ALGORITHMS {
+  DFS = "DFS",
+  BFS = "BFS",
+  IDDFS = "IDDFS",
   DIJSKTRA = "DIJSKTRA",
   ASTAR = "ASTAR",
 }
 
 export const menu: Menu[] = [
-  { name: MENU_NAME.ALGORITHMS, children: ["Dijsktra", "A Star"] },
+  {
+    name: MENU_NAME.ALGORITHMS,
+    children: ["DFS", "BFS", "IDDFS", "Dijsktra", "A Star"],
+  },
   { name: MENU_NAME.CONFIG, children: [] },
 ];
 

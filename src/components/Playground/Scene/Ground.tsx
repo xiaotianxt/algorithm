@@ -9,13 +9,7 @@ export const Ground: FC<{
     () =>
       new Array(row).fill(0).map((_, rowid) =>
         new Array(col).fill(0).map((_, colid) => {
-          return (
-            <Cell
-              key={`${rowid}-${colid}`}
-              col={colid - col / 2}
-              row={rowid - row / 2}
-            />
-          );
+          return <Cell key={`${rowid}-${colid}`} colid={colid} rowid={rowid} />;
         })
       ),
     [row, col]

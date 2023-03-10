@@ -1,19 +1,21 @@
 import { LEFT_MOUSE_BUTTON, RIGHT_MOUSE_BUTTON } from "@/constants";
-import { ThreeElements, useFrame } from "@react-three/fiber";
-import { useRef, useReducer, useEffect, useMemo } from "react";
-import { CellState, defaultCellState } from "../types";
+import { ThreeElements } from "@react-three/fiber";
 import { animated, useSpring } from "@react-spring/web";
 import { Vector3 } from "three";
+import { useConfigStore } from "@/store/config";
+import { Cell, useGameStore } from "@/store/game";
+import { useMemo, useState } from "react";
 
 export function SimpleBox({
   state,
+  hover,
   ...props
-}: ThreeElements["mesh"] & { state: CellState }) {
+}: ThreeElements["mesh"] & { state: Cell; hover: boolean }) {
   return (
     <mesh {...props}>
       <boxGeometry args={[0.9, 0.9, 0.9]} />
       <meshStandardMaterial
-        color={state.hover ? "hotpink" : state.wall ? "crimson" : "darkorange"}
+        color={hover ? "hotpink" : state.wall ? "crimson" : "darkorange"}
       />
     </mesh>
   );
@@ -22,42 +24,49 @@ export function SimpleBox({
 const AnimatedBox = animated(SimpleBox);
 
 export function Cell({
-  row,
-  col,
+  rowid,
+  colid,
   ...props
-}: ThreeElements["mesh"] & { row: number; col: number }) {
-  const [state, dispatch] = useReducer(
-    (state: CellState, newState: Partial<CellState>) => ({
-      ...state,
-      ...newState,
-    }),
-    defaultCellState
-  );
+}: ThreeElements["mesh"] & { rowid: number; colid: number }) {
+  const [hover, setHover] = useState(false);
+
+  const { row, col } = useConfigStore();
+  const { update, grid } = useGameStore();
 
   const { position } = useSpring({
-    position: state.wall ? [col, row, 1] : [col, row, 0],
+    position: grid[rowid][colid].wall
+      ? [colid - col / 2, rowid - row / 2, 1]
+      : [colid - col / 2, rowid - row / 2, 0],
   });
+
+  const state = grid[rowid][colid];
 
   return (
     <AnimatedBox
       castShadow
       receiveShadow
       state={state}
+      hover={hover}
       position={position as unknown as Vector3}
-      {...props}
       onPointerOver={(event) => {
         event.stopPropagation();
-        dispatch({ hover: true });
+        setHover(true);
       }}
       onPointerOut={(event) => {
         event.stopPropagation();
-        dispatch({ hover: false });
+        setHover(false);
       }}
       onPointerDown={(event) => {
         event.stopPropagation();
-        event.button == RIGHT_MOUSE_BUTTON && dispatch({});
-        event.button == LEFT_MOUSE_BUTTON && dispatch({ wall: !state.wall });
+        switch (event.button) {
+          case RIGHT_MOUSE_BUTTON:
+            break;
+          case LEFT_MOUSE_BUTTON:
+            update(rowid, colid, "wall", !state.wall);
+            break;
+        }
       }}
+      {...props}
     />
   );
 }
