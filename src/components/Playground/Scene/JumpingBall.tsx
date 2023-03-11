@@ -1,62 +1,85 @@
 import { ThreeElements } from "@react-three/fiber";
-import { FC, useEffect, useReducer } from "react";
-import { BallState, defaultBallState } from "../types";
+import { FC, useEffect, useState } from "react";
 import { animated, useSpring } from "@react-spring/web";
+import { useDrag } from "@use-gesture/react";
+import { Plane, Ray, Vector3 } from "three";
+import { useGameStore } from "@/store/game";
 
-export const Ball: FC<
-  ThreeElements["mesh"] & {
-    speed?: number;
-    height?: number;
-    state: BallState;
-  }
-> = ({ speed = 8, state, height = 1, ...props }) => {
+const plane = new Plane(new Vector3(0, 0, 0.5));
+
+const Ball: FC<ThreeElements["mesh"]> = ({ ...props }) => {
+  const [hover, setHover] = useState(false);
   return (
-    <mesh {...props}>
+    <mesh
+      {...props}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setHover(true);
+      }}
+      onPointerOut={(e) => {
+        e.stopPropagation();
+        setHover(false);
+      }}
+    >
       <sphereGeometry args={[0.35, 32, 32]} />
-      <meshStandardMaterial
-        color={state?.hover ? "hotpink" : "LightSeaGreen"}
-      />
+      <meshStandardMaterial color={hover ? "hotpink" : "LightSeaGreen"} />
     </mesh>
   );
 };
 
 export const AnimatedBall = animated(Ball);
 
-export const JumpingBall = () => {
-  const [state, setState] = useReducer(
-    (state: BallState, newState: Partial<BallState>) => ({
-      ...state,
-      ...newState,
-    }),
-    { ...defaultBallState, position: [0, 0, 1] }
-  );
+export const JumpingBall: FC<
+  ThreeElements["mesh"] & {
+    drag: boolean;
+    setDrag: (v: boolean) => void;
+  }
+> = ({ drag, setDrag, ...props }) => {
+  const [pos, setPos] = useState([0, 0, 1]);
+  const [{ position }, api] = useSpring(() => ({
+    position: pos,
+  }));
 
-  const { scale } = useSpring({ scale: state.hover ? 1.2 : 1 });
+  const { over } = useGameStore();
 
   useEffect(() => {
-    document.body.style.cursor = state.hover ? "pointer" : "auto";
-  }, [state.hover]);
+    !drag && over && api.start({ position: [over[1] - 5, over[0] - 5, 1] });
+  }, [drag]);
+
+  const plainIntersectPoint = new Vector3();
+  const bind = useDrag(({ active, timeStamp, event }) => {
+    if (active) {
+      const ray = (event as any).ray as Ray;
+      ray.intersectPlane(plane, plainIntersectPoint);
+      setPos([plainIntersectPoint.x, plainIntersectPoint.y, pos[2]]);
+    }
+
+    setDrag(active);
+
+    api.start({
+      position: pos,
+    });
+
+    return timeStamp;
+  });
+  const bindEventsHandler = bind();
 
   return (
     <AnimatedBall
-      height={0.5}
-      scale={scale}
-      position={state.position}
-      state={state}
-      onPointerEnter={(e) => {
+      position={position}
+      {...(bindEventsHandler as any)}
+      {...props}
+      onPointerUp={(e, ...args) => {
         e.stopPropagation();
-        setState({ hover: true });
+        bindEventsHandler.onPointerUp?.call(this, e as any, ...args);
       }}
-      onPointerLeave={(e) => {
+      onPointerDown={(e, ...args) => {
         e.stopPropagation();
-        setState({ hover: false });
+        bindEventsHandler.onPointerDown?.call(this, e as any, ...args);
       }}
-      onPointerDown={(e) => {
-        e.stopPropagation();
-      }}
-      onPointerUp={(e) => {
-        e.stopPropagation();
-      }}
-    />
+    >
+      <sphereGeometry args={[0.35, 32, 32]} />
+      <meshStandardMaterial color={"hotpink"} />
+    </AnimatedBall>
   );
 };

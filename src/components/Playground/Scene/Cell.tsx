@@ -4,7 +4,7 @@ import { animated, useSpring } from "@react-spring/web";
 import { Vector3 } from "three";
 import { useConfigStore } from "@/store/config";
 import { Cell, useGameStore } from "@/store/game";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 export function SimpleBox({
   state,
@@ -31,7 +31,7 @@ export function Cell({
   const [hover, setHover] = useState(false);
 
   const { row, col } = useConfigStore();
-  const { update, grid } = useGameStore();
+  const { update, grid, setOver, active } = useGameStore();
 
   const { position } = useSpring({
     position: grid[rowid][colid].wall
@@ -49,14 +49,18 @@ export function Cell({
       hover={hover}
       position={position as unknown as Vector3}
       onPointerOver={(event) => {
+        if (!active) return;
         event.stopPropagation();
         setHover(true);
+        setOver(rowid, colid);
       }}
       onPointerOut={(event) => {
+        if (!active) return;
         event.stopPropagation();
         setHover(false);
       }}
       onPointerDown={(event) => {
+        if (!active) return;
         event.stopPropagation();
         switch (event.button) {
           case RIGHT_MOUSE_BUTTON:

@@ -23,15 +23,23 @@ const createNewGrid = (row: number, col: number) => {
 
 export const useGameStore = create<{
   grid: Cell[][];
+  over: [x: number, y: number] | undefined;
+  setOver: (x: number, y: number) => void;
   update(
     x: number,
     y: number,
     property: "wall" | "start" | "target",
     value: boolean
   ): void;
+  active: boolean;
+  toggleActive: () => void;
 }>((set) => {
   return {
     grid: createNewGrid(10, 10),
+    over: undefined,
+    setOver(x, y) {
+      set((state) => ({ ...state, over: [x, y] }));
+    },
     update(x, y, property, value) {
       set((state) => {
         state.grid[x][y][property] = value;
@@ -49,6 +57,10 @@ export const useGameStore = create<{
           grid: createNewGrid(row, col),
         };
       });
+    },
+    active: true,
+    toggleActive() {
+      set((state) => ({ ...state, active: !state.active }));
     },
   };
 });
