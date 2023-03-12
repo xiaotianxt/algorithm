@@ -6,10 +6,12 @@ import { Ground } from "./Ground";
 import { JumpingBall } from "./JumpingBall";
 import { OrthographicCamera } from "three";
 import { useGameStore } from "@/store/game";
+import { JumpingStar } from "./Star";
 
 export const Scene = () => {
-  const [drag, setDrag] = useState(false);
-  const { toggleActive } = useGameStore();
+  const [dragStart, setDragStart] = useState(false);
+  const [dragTarget, setDragTarget] = useState(false);
+  const { setActive } = useGameStore();
   const camera = useMemo(() => {
     const camera = new OrthographicCamera();
     camera.zoom = 40;
@@ -26,18 +28,19 @@ export const Scene = () => {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <Ground row={10} col={10} />
-      <JumpingBall drag={drag} setDrag={setDrag} />
+      <JumpingBall drag={dragStart} setDrag={setDragStart} />
+      <JumpingStar drag={dragTarget} setDrag={setDragTarget} />
       <CameraControls
         makeDefault
-        onStart={(e) => toggleActive()}
-        onEnd={(e) => toggleActive()}
+        onStart={() => setActive(false)}
+        onEnd={() => setActive(true)}
         minPolarAngle={Math.PI / 2 + 0.1}
         maxPolarAngle={(Math.PI / 3) * 2}
         maxAzimuthAngle={Math.PI / 3}
         minAzimuthAngle={-Math.PI / 3}
         maxZoom={50}
         minZoom={30}
-        enabled={!drag}
+        enabled={!dragStart && !dragTarget}
       />
     </Canvas>
   );

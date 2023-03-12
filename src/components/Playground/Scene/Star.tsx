@@ -1,46 +1,52 @@
-import { ThreeElements } from "@react-three/fiber";
-import { FC, useEffect, useState } from "react";
+import { ThreeElements, useFrame } from "@react-three/fiber";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { animated, useSpring } from "@react-spring/web";
 import { useDrag } from "@use-gesture/react";
-import { Plane, Ray, Vector3 } from "three";
+import { Mesh, MeshBasicMaterial, Plane, Ray, Vector3 } from "three";
 import { useGameStore } from "@/store/game";
+import ObjToPrimitive from "@/utils/three";
 
 const plane = new Plane(new Vector3(0, 0, 0.5));
 
-const Ball: FC<ThreeElements["mesh"]> = ({ ...props }) => {
-  const [hover, setHover] = useState(false);
+const Star: FC<ThreeElements["mesh"]> = ({ ...props }) => {
+  const [hover, toggle] = useState(false);
+  const mat = useMemo(
+    () => new MeshBasicMaterial({ color: hover ? "hotpink" : "DodgerBlue" }),
+    [hover]
+  );
   return (
     <mesh
       {...props}
+      scale={[0.05, 0.05, 0.15]}
+      castShadow
+      receiveShadow
       onPointerOver={(e) => {
         e.stopPropagation();
-        setHover(true);
+        toggle(true);
       }}
       onPointerOut={(e) => {
         e.stopPropagation();
-        setHover(false);
+        toggle(false);
       }}
     >
-      <sphereGeometry args={[0.35, 32, 32]} />
-      <meshStandardMaterial color={hover ? "hotpink" : "LightSeaGreen"} />
+      <ObjToPrimitive url="/star.obj" mat={mat} />
     </mesh>
   );
 };
 
-export const AnimatedBall = animated(Ball);
+export const AnimatedStar = animated(Star);
 
-export const JumpingBall: FC<
-  ThreeElements["mesh"] & {
-    drag: boolean;
-    setDrag: (v: boolean) => void;
-  }
-> = ({ drag, setDrag, ...props }) => {
+export const JumpingStar: FC<{
+  drag: boolean;
+  setDrag: (v: boolean) => void;
+}> = ({ drag, setDrag, ...props }) => {
   const [pos, setPos] = useState([0, 0, 1]);
+  const ref = useRef<Mesh>(null!);
   const [{ position }, api] = useSpring(() => ({
     position: pos,
   }));
 
-  const { over, updateSource } = useGameStore();
+  const { over, updateTarget } = useGameStore();
 
   useEffect(() => {
     !drag && over && api.start({ position: [over[1] - 5, over[0] - 5, 1] });
@@ -53,7 +59,7 @@ export const JumpingBall: FC<
       ray.intersectPlane(plane, plainIntersectPoint);
       setPos([plainIntersectPoint.x, plainIntersectPoint.y, pos[2]]);
     } else {
-      over && updateSource(...over);
+      over && updateTarget(...over);
     }
 
     setDrag(active);
@@ -67,10 +73,11 @@ export const JumpingBall: FC<
   const bindEventsHandler = bind();
 
   return (
-    <AnimatedBall
+    <AnimatedStar
       position={position}
       {...(bindEventsHandler as any)}
       {...props}
+      ref={ref}
       onPointerUp={(e, ...args) => {
         e.stopPropagation();
         bindEventsHandler.onPointerUp?.call(this, e as any, ...args);
