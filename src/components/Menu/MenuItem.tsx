@@ -3,14 +3,18 @@ import { capitalize } from "../../utils";
 import { Menu } from "./types";
 import "./index.css";
 
-const SubMenuItem: FC<{ name: string; selected: boolean }> = ({
-  name,
-  selected = false,
-}) => {
+const SubMenuItem: FC<{
+  name: string;
+  selectedChildren: boolean;
+  handleClick?: (v: any) => void;
+}> = ({ name, handleClick, selectedChildren = false }) => {
   return (
     <div className="bg-slate-500 hover:bg-slate-900">
       <button
-        className={`h-full w-full block p-2 ${selected ? "bg-blue-800" : ""}`}
+        className={`h-full w-full block p-2 ${
+          selectedChildren ? "bg-blue-800" : ""
+        }`}
+        onClick={() => handleClick && handleClick(name)}
       >
         {capitalize(name)}
       </button>
@@ -18,14 +22,20 @@ const SubMenuItem: FC<{ name: string; selected: boolean }> = ({
   );
 };
 
-const SubMenuList: FC<{ children: string[]; selected?: string }> = ({
-  children,
-  selected,
-}) => {
+const SubMenuList: FC<{
+  children: string[];
+  selectedChildren?: string;
+  handleClick?: (v: any) => void;
+}> = ({ children, selectedChildren, handleClick }) => {
   const subMenuNodes = useMemo(
     () =>
       children.map((child) => (
-        <SubMenuItem key={child} name={child} selected={selected === child} />
+        <SubMenuItem
+          key={child}
+          name={child}
+          selectedChildren={selectedChildren === child}
+          handleClick={handleClick}
+        />
       )),
     [children]
   );
@@ -36,13 +46,13 @@ const SubMenuList: FC<{ children: string[]; selected?: string }> = ({
   );
 };
 
-export const Index: FC<Menu> = ({ name, children, selectedChildren }) => {
+export const Index: FC<Menu> = ({ name, onChange: handleClick, ...props }) => {
   return (
     <div className="relative transition-all hover:scale-105 ease-in-out">
       <div className="hover:bg-slate-500 p-2 rounded relative menu-item">
         {capitalize(name)}
       </div>
-      <SubMenuList children={children} selected={selectedChildren} />
+      <SubMenuList handleClick={handleClick} {...props} />
     </div>
   );
 };

@@ -5,7 +5,7 @@ export enum MENU_NAME {
   CONFIG = "CONFIG",
 }
 
-export enum ALGORITHMS {
+export enum ALGORITHM {
   DFS = "DFS",
   BFS = "BFS",
   IDDFS = "IDDFS",
@@ -13,13 +13,7 @@ export enum ALGORITHMS {
   ASTAR = "ASTAR",
 }
 
-export const menu: Menu[] = [
-  {
-    name: MENU_NAME.ALGORITHMS,
-    children: ["DFS", "BFS", "IDDFS", "Dijsktra", "A Star"],
-  },
-  { name: MENU_NAME.CONFIG, children: [] },
-];
+
 
 export const LEFT_MOUSE_BUTTON = 0;
 export const RIGHT_MOUSE_BUTTON = 2;
