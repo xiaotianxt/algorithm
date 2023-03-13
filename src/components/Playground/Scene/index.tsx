@@ -1,12 +1,13 @@
-import { CameraControls } from "@react-three/drei";
-import Control from "../../Control";
-import { Canvas } from "@react-three/fiber";
+import { CameraControls, CameraShake } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ComponentProps, FC, useMemo, useState } from "react";
 import { Ground } from "./Ground";
 import { JumpingBall } from "./JumpingBall";
-import { OrthographicCamera } from "three";
+import { OrthographicCamera, Vector3 } from "three";
 import { useGameStore } from "@/store/game";
 import { JumpingStar } from "./Star";
+import { Path } from "./Path";
+import Control from "@/components/Control";
 
 export const Scene = () => {
   const [dragStart, setDragStart] = useState(false);
@@ -42,6 +43,7 @@ export const Scene = () => {
         minZoom={30}
         enabled={!dragStart && !dragTarget}
       />
+      <Path />
     </Canvas>
   );
 };
