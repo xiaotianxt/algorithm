@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { useConfigStore } from "./config";
 
 export type Cell = {
-  x: number;
-  y: number;
+  row: number;
+  col: number;
   wall: boolean;
   start: boolean;
   target: boolean;
@@ -12,8 +12,8 @@ export type Cell = {
 const createNewGrid = (row: number, col: number) => {
   return [...Array(row)].map((_, i) =>
     [...Array(col)].map((_, j) => ({
-      x: j,
-      y: i,
+      row: j,
+      col: i,
       wall: false,
       start: false,
       target: false,
@@ -23,10 +23,10 @@ const createNewGrid = (row: number, col: number) => {
 
 export const useGameStore = create<{
   grid: Cell[][];
-  target: { x: number; y: number };
-  source: { x: number; y: number };
-  over: [x: number, y: number] | undefined;
-  setOver: (x: number, y: number) => void;
+  target: { row: number; col: number };
+  source: { row: number; col: number };
+  over: { row: number; col: number } | undefined;
+  setOver: (row: number, col: number) => void;
   update(
     x: number,
     y: number,
@@ -35,18 +35,18 @@ export const useGameStore = create<{
   ): void;
   active: boolean;
   setActive: (v: boolean) => void;
-  updateTarget: (x: number, y: number) => void;
-  updateSource: (x: number, y: number) => void;
+  updateTarget: (over: { row: number; col: number }) => void;
+  updateSource: (over: { row: number; col: number }) => void;
 }>((set) => {
   return {
     grid: createNewGrid(10, 10),
     over: undefined,
-    setOver(x, y) {
-      set((state) => ({ ...state, over: [x, y] }));
+    setOver(row, col) {
+      set((state) => ({ ...state, over: { row, col } }));
     },
-    update(x, y, property, value) {
+    update(row, col, property, value) {
       set((state) => {
-        state.grid[x][y][property] = value;
+        state.grid[row][col][property] = value;
         return {
           ...state,
           grid: [...state.grid],
@@ -66,13 +66,13 @@ export const useGameStore = create<{
     setActive(v) {
       set((state) => ({ ...state, active: v }));
     },
-    target: { x: 0, y: 0 },
-    updateTarget(x, y) {
-      set((state) => ({ ...state, target: { x, y } }));
+    target: { row: 0, col: 0 },
+    updateTarget(over) {
+      set((state) => ({ ...state, target: over }));
     },
-    source: { x: 9, y: 9 },
-    updateSource(x, y) {
-      set((state) => ({ ...state, target: { x, y } }));
+    source: { row: 9, col: 9 },
+    updateSource(over) {
+      set((state) => ({ ...state, source: over }));
     },
   };
 });

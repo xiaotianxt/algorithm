@@ -2,9 +2,9 @@ import { LEFT_MOUSE_BUTTON, RIGHT_MOUSE_BUTTON } from "@/constants";
 import { ThreeElements } from "@react-three/fiber";
 import { animated, useSpring } from "@react-spring/web";
 import { Vector3 } from "three";
-import { useConfigStore } from "@/store/config";
 import { Cell, useGameStore } from "@/store/game";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { stateOfCell, transform } from "@/utils/three";
 
 export function SimpleBox({
   state,
@@ -23,6 +23,11 @@ export function SimpleBox({
 
 const AnimatedBox = animated(SimpleBox);
 
+const from = -1,
+  to = 1;
+const ShakingRange = [0, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 1];
+const ShakingInterpolate = [from, to, from, to, from, to, from, 200];
+
 export function Cell({
   rowid,
   colid,
@@ -30,16 +35,19 @@ export function Cell({
 }: ThreeElements["mesh"] & { rowid: number; colid: number }) {
   const [hover, setHover] = useState(false);
 
-  const { row, col } = useConfigStore();
   const { update, grid, setOver, active } = useGameStore();
-
-  const { position } = useSpring({
-    position: grid[rowid][colid].wall
-      ? [colid - col / 2, rowid - row / 2, 1]
-      : [colid - col / 2, rowid - row / 2, 0],
-  });
-
   const state = grid[rowid][colid];
+
+  // basic position
+  const [x0, y0] = transform({ row: rowid, col: colid });
+
+  // shake positioning
+  const [{ position }, api] = useSpring(
+    () => ({
+      position: state.wall ? [x0, y0, 1] : [x0, y0, 0],
+    }),
+    [state.wall]
+  );
 
   return (
     <AnimatedBox
@@ -47,7 +55,7 @@ export function Cell({
       receiveShadow
       state={state}
       hover={hover}
-      position={position as unknown as Vector3}
+      position={position as any as Vector3}
       onPointerOver={(event) => {
         if (!active) return;
         event.stopPropagation();
@@ -62,6 +70,10 @@ export function Cell({
       onPointerDown={(event) => {
         if (!active) return;
         event.stopPropagation();
+        const cellState = stateOfCell(rowid, colid);
+        if (cellState === "source" || cellState === "target") {
+          return;
+        }
         switch (event.button) {
           case RIGHT_MOUSE_BUTTON:
             break;

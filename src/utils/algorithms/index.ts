@@ -8,7 +8,7 @@ export abstract class Algorithm {
 
 function isConnected(x: Cell, y: Cell) {
   if (x.wall || y.wall) return false;
-  return Math.abs(x.x - y.x) + Math.abs(x.y - y.y) == 1;
+  return Math.abs(x.row - y.row) + Math.abs(x.col - y.col) == 1;
 }
 
 export function convertGridToGraph(): PileGraph {

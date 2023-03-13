@@ -4,6 +4,7 @@ import { animated, useSpring } from "@react-spring/web";
 import { useDrag } from "@use-gesture/react";
 import { Plane, Ray, Vector3 } from "three";
 import { useGameStore } from "@/store/game";
+import { stateOfCell, transform } from "@/utils/three";
 
 const plane = new Plane(new Vector3(0, 0, 0.5));
 
@@ -35,16 +36,15 @@ export const JumpingBall: FC<
     setDrag: (v: boolean) => void;
   }
 > = ({ drag, setDrag, ...props }) => {
-  const [pos, setPos] = useState([0, 0, 1]);
+  const { over, updateSource, source } = useGameStore();
+  const [pos, setPos] = useState([...transform(source), 1]);
   const [{ position }, api] = useSpring(() => ({
     position: pos,
   }));
 
-  const { over, updateSource } = useGameStore();
-
   useEffect(() => {
-    !drag && over && api.start({ position: [over[1] - 5, over[0] - 5, 1] });
-  }, [drag]);
+    !drag && source && api.start({ position: [...transform(source), 1] });
+  }, [drag, source]);
 
   const plainIntersectPoint = new Vector3();
   const bind = useDrag(({ active, timeStamp, event }) => {
@@ -53,7 +53,7 @@ export const JumpingBall: FC<
       ray.intersectPlane(plane, plainIntersectPoint);
       setPos([plainIntersectPoint.x, plainIntersectPoint.y, pos[2]]);
     } else {
-      over && updateSource(...over);
+      over && stateOfCell(over) === "cell" && updateSource(over);
     }
 
     setDrag(active);
