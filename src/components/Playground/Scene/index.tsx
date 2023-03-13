@@ -7,6 +7,7 @@ import { JumpingBall } from "./JumpingBall";
 import { OrthographicCamera } from "three";
 import { useGameStore } from "@/store/game";
 import { JumpingStar } from "./Star";
+import { Path } from "./Path";
 
 export const Scene = () => {
   const [dragStart, setDragStart] = useState(false);
@@ -42,6 +43,7 @@ export const Scene = () => {
         minZoom={30}
         enabled={!dragStart && !dragTarget}
       />
+      <Path />
     </Canvas>
   );
 };

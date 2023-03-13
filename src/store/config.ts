@@ -7,7 +7,7 @@ export const useConfigStore = create<{
   col: number;
   updateAlgorithm: (v: ALGORITHM) => void;
 }>((set) => ({
-  algorithm: ALGORITHM.DIJSKTRA,
+  algorithm: ALGORITHM.DFS,
   row: 10,
   col: 10,
   updateAlgorithm(algorithm: ALGORITHM) {

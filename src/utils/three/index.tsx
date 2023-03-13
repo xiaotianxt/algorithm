@@ -62,15 +62,18 @@ export type CellType = "cell" | "target" | "source" | "wall";
 export type GeoLocation = [x: number, y: number, z?: number];
 export type StateLocation = { row: number; col: number };
 
-export function transform(state: StateLocation): GeoLocation;
+export function transform(state: StateLocation, z?: number): GeoLocation;
 export function transform(geo: GeoLocation): StateLocation;
 export function transform(
-  loc: StateLocation | GeoLocation
+  loc: StateLocation | GeoLocation,
+  z?: number
 ): StateLocation | GeoLocation {
   const { row, col } = useConfigStore.getState();
   if (Array.isArray(loc)) {
     return { row: loc[0] + col / 2, col: loc[1] + row / 2 };
   } else {
-    return [loc.col - col / 2, loc.row - row / 2];
+    return z === undefined
+      ? [loc.col - col / 2, loc.row - row / 2]
+      : [loc.col - col / 2, loc.row - row / 2, z];
   }
 }
