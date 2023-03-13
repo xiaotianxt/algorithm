@@ -48,12 +48,12 @@ const SubMenuList: FC<{
 
 export const Index: FC<Menu> = ({ name, onChange: handleClick, ...props }) => {
   return (
-    <div className="relative transition-all hover:scale-105 ease-in-out">
-      <div className="hover:bg-slate-500 p-2 rounded relative menu-item">
+    <li className="relative transition-all hover:scale-105 ease-in-out">
+      <div className="hover:bg-slate-500 p-2 rounded relative menu-item truncate">
         {capitalize(name)}
       </div>
       <SubMenuList handleClick={handleClick} {...props} />
-    </div>
+    </li>
   );
 };
 

@@ -1,8 +1,11 @@
-export const Index = () => {
+import { FC, HTMLAttributes } from "react";
+
+export const Index: FC<HTMLAttributes<HTMLImageElement>> = ({ ...props }) => {
   return (
     <img
+      {...props}
       src="/ai.svg"
-      className="h-full aspect-square p-3 border-content"
+      className={`border-content ${props.className}`}
       title="al logo"
     />
   );

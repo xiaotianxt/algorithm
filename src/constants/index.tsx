@@ -1,7 +1,7 @@
 import { Menu } from "@/components/Menu/types";
 
 export enum MENU_NAME {
-  ALGORITHMS = "ALGORITHMS",
+  ALGORITHMS = "SELECT ALGORITHMS",
   CONFIG = "CONFIG",
 }
 

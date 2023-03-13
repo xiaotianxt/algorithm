@@ -1,4 +1,4 @@
-import { ComponentProps, FC, useMemo } from "react";
+import { ComponentProps, FC, useMemo, useState } from "react";
 import Logo from "../Logo";
 import { MenuList } from "../Menu";
 import { ALGORITHM, MENU_NAME } from "@/constants";
@@ -8,6 +8,7 @@ import Control from "@/components/Control";
 
 export const Index: FC<ComponentProps<"div">> = () => {
   const { algorithm, updateAlgorithm } = useConfigStore();
+  const [hidden, setHidden] = useState(true);
   const menu = useMemo<Menu[]>(() => {
     return [
       {
@@ -20,10 +21,16 @@ export const Index: FC<ComponentProps<"div">> = () => {
     ];
   }, [algorithm]);
   return (
-    <div className="flex w-full h-16 bg-slate-700 justify-between">
-      <div className="flex items-center space-x-3">
-        <Logo />
-        <MenuList items={menu} />
+    <div className="flex flex-col w-full bg-slate-700 p-2 sm:flex-row sm:justify-between">
+      <div className="duration-100 flex flex-col items-center justify-around mx-2 sm:flex-row sm:space-x-3">
+        <Logo
+          className="aspect-square w-10"
+          onClick={(e) => setHidden((v) => !v)}
+        />
+        <MenuList
+          items={menu}
+          className={`transition-all ease-in-out ${hidden && "hidden"} sm:flex`}
+        />
       </div>
       <div className="flex items-center">
         <Control />
