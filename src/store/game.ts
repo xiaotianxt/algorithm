@@ -7,6 +7,7 @@ export type Cell = {
   wall: boolean;
   start: boolean;
   target: boolean;
+  path: boolean;
 };
 
 const createNewGrid = (row: number, col: number) => {
@@ -17,6 +18,7 @@ const createNewGrid = (row: number, col: number) => {
       wall: false,
       start: false,
       target: false,
+      path: false,
     }))
   );
 };

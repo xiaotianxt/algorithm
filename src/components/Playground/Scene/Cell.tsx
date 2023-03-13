@@ -15,7 +15,15 @@ export function SimpleBox({
     <mesh {...props}>
       <boxGeometry args={[0.9, 0.9, 0.9]} />
       <meshStandardMaterial
-        color={hover ? "hotpink" : state.wall ? "crimson" : "darkorange"}
+        color={
+          hover
+            ? "hotpink"
+            : state.path
+            ? "ForestGreen"
+            : state.wall
+            ? "crimson"
+            : "darkorange"
+        }
       />
     </mesh>
   );

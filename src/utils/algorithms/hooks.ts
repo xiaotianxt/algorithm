@@ -1,14 +1,14 @@
 import { useConfigStore } from "@/store/config";
 import { useGameStore } from "@/store/game";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { convertGridToGraph, factory } from ".";
-import { Solution } from "./types";
+import { StateLocation } from "../three";
 
-export function usePathResolver(): Solution {
+export function usePathResolver(): StateLocation[] {
   const { source, target, grid } = useGameStore();
-  const { algorithm, col } = useConfigStore();
+  const { algorithm, col, row } = useConfigStore();
 
-  const path = useMemo<Solution>(() => {
+  const path = useMemo<StateLocation[]>(() => {
     const graph = convertGridToGraph();
     const solver = factory.getAlgorithm(algorithm);
     if (solver) {
@@ -17,11 +17,25 @@ export function usePathResolver(): Solution {
         col * target.row + target.col,
         graph
       );
-      return ans;
+      const stateLocations: StateLocation[] = ans.map((item) => ({
+        row: Math.floor(item / col),
+        col: item % col,
+      }));
+      return stateLocations;
     } else {
       return [];
     }
   }, [source, target, grid, algorithm]);
+  useEffect(() => {
+    for (let i = 0; i < row; i++) {
+      for (let j = 0; j < col; j++) {
+        grid[i][j].path = false;
+      }
+    }
+    for (const state of path) {
+      grid[state.row][state.col].path = true;
+    }
+  }, [path]);
 
   return path;
 }
