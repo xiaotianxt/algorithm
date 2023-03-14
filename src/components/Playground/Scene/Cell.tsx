@@ -2,32 +2,26 @@ import { LEFT_MOUSE_BUTTON, RIGHT_MOUSE_BUTTON } from "@/constants";
 import { ThreeElements } from "@react-three/fiber";
 import { animated, useSpring } from "@react-spring/web";
 import { Vector3 } from "three";
-import { Cell, useGameStore } from "@/store/game";
-import { useEffect, useState } from "react";
+import { CellState, useGameStore } from "@/store/game";
+import { FC, memo, useState } from "react";
 import { stateOfCell, transform } from "@/utils/three";
 
-export function SimpleBox({
-  state,
-  hover,
-  color,
-  ...props
-}: ThreeElements["mesh"] & { state: Cell; hover: boolean; color: string }) {
+export const SimpleBox: FC<
+  ThreeElements["mesh"] & { state: CellState; hover: boolean; color: string }
+> = ({ state, hover, color, ...props }) => {
   return (
     <mesh {...props}>
       <boxGeometry args={[0.9, 0.9, 0.9]} />
       <meshStandardMaterial color={hover ? "hotpink" : color} />
     </mesh>
   );
-}
+};
 
 const AnimatedBox = animated(SimpleBox);
 
-export function Cell({
-  rowid,
-  colid,
-  color,
-  ...props
-}: ThreeElements["mesh"] & { rowid: number; colid: number; color: string }) {
+export const Cell: FC<
+  ThreeElements["mesh"] & { rowid: number; colid: number; color: string }
+> = ({ rowid, colid, color, ...props }) => {
   const [hover, setHover] = useState(false);
 
   const { update, grid, setOver, active } = useGameStore();
@@ -81,4 +75,6 @@ export function Cell({
       color={color}
     />
   );
-}
+};
+
+export default memo(Cell);

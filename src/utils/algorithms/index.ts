@@ -1,4 +1,4 @@
-import { Cell, useGameStore } from "@/store/game";
+import { CellState, useGameStore } from "@/store/game";
 import { Pile, PileGraph, Solution } from "./types";
 import { BFSAlgorithm } from "./bfs";
 import { DFSAlgorithm } from "./dfs";
@@ -9,7 +9,7 @@ export abstract class Algorithm {
   abstract solve(start: Pile, target: Pile, graph: PileGraph): Solution;
 }
 
-function isConnected(x: Cell, y: Cell) {
+function isConnected(x: CellState, y: CellState) {
   if (x.wall || y.wall) return false;
   return Math.abs(x.row - y.row) + Math.abs(x.col - y.col) == 1;
 }

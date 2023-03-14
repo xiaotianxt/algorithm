@@ -1,5 +1,5 @@
-import { FC, useMemo } from "react";
-import { Cell } from "./Cell";
+import { FC } from "react";
+import Cell from "./Cell";
 
 export const Ground: FC<{
   row: number;

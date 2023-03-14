@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { useConfigStore } from "./config";
 import { StateLocation } from "@/utils/three";
 
-export type Cell = {
+export type CellState = {
   row: number;
   col: number;
   wall: boolean;
@@ -25,7 +25,7 @@ const createNewGrid = (row: number, col: number) => {
 };
 
 export const useGameStore = create<{
-  grid: Cell[][];
+  grid: CellState[][];
   target: { row: number; col: number };
   source: { row: number; col: number };
   over: { row: number; col: number } | undefined;
@@ -33,7 +33,7 @@ export const useGameStore = create<{
   update(
     x: number,
     y: number,
-    property: Exclude<keyof Cell, "row" | "col">,
+    property: Exclude<keyof CellState, "row" | "col">,
     value: boolean
   ): void;
   active: boolean;
