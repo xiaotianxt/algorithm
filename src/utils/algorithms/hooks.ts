@@ -1,12 +1,15 @@
 import { useConfigStore } from "@/store/config";
 import { useGameStore } from "@/store/game";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { convertGridToGraph, factory } from ".";
 import { StateLocation } from "../three";
 
-export function usePathResolver(): StateLocation[] {
+export function usePathResolver(): {
+  path: StateLocation[];
+  gridColor: string[][];
+} {
   const { source, target, grid } = useGameStore();
-  const { algorithm, col, row } = useConfigStore();
+  const { algorithm, col } = useConfigStore();
 
   const path = useMemo<StateLocation[]>(() => {
     const graph = convertGridToGraph();
@@ -26,16 +29,14 @@ export function usePathResolver(): StateLocation[] {
       return [];
     }
   }, [source, target, grid, algorithm]);
-  useEffect(() => {
-    for (let i = 0; i < row; i++) {
-      for (let j = 0; j < col; j++) {
-        grid[i][j].path = false;
-      }
-    }
-    for (const state of path) {
-      grid[state.row][state.col].path = true;
-    }
-  }, [path]);
 
-  return path;
+  const gridColor = useMemo<string[][]>(() => {
+    const color: string[][] = grid.map((row) =>
+      row.map((cell) => (cell.wall ? "crimson" : "darkorange"))
+    );
+    path.forEach(({ row, col }) => (color[row][col] = "ForestGreen"));
+    return color;
+  }, [path, grid]);
+
+  return { path, gridColor };
 }

@@ -3,11 +3,12 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ComponentProps, FC, useMemo, useState } from "react";
 import { Ground } from "./Ground";
 import { JumpingBall } from "./JumpingBall";
-import { OrthographicCamera, Vector3 } from "three";
+import { OrthographicCamera } from "three";
 import { useGameStore } from "@/store/game";
 import { JumpingStar } from "./Star";
 import { Path } from "./Path";
 import Control from "@/components/Control";
+import { usePathResolver } from "@/utils/algorithms/hooks";
 
 export const Scene = () => {
   const [dragStart, setDragStart] = useState(false);
@@ -19,6 +20,7 @@ export const Scene = () => {
     camera.position.set(1, -1, 10);
     return camera;
   }, []);
+  const { path, gridColor } = usePathResolver();
 
   return (
     <Canvas
@@ -28,7 +30,7 @@ export const Scene = () => {
     >
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
-      <Ground row={10} col={10} />
+      <Ground row={10} col={10} gridColor={gridColor} />
       <JumpingBall drag={dragStart} setDrag={setDragStart} />
       <JumpingStar drag={dragTarget} setDrag={setDragTarget} />
       <CameraControls
@@ -43,7 +45,7 @@ export const Scene = () => {
         minZoom={30}
         enabled={!dragStart && !dragTarget}
       />
-      <Path />
+      <Path path={path} />
     </Canvas>
   );
 };

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { useConfigStore } from "./config";
+import { StateLocation } from "@/utils/three";
 
 export type Cell = {
   row: number;
@@ -32,13 +33,14 @@ export const useGameStore = create<{
   update(
     x: number,
     y: number,
-    property: "wall" | "start" | "target",
+    property: Exclude<keyof Cell, "row" | "col">,
     value: boolean
   ): void;
   active: boolean;
   setActive: (v: boolean) => void;
   updateTarget: (over: { row: number; col: number }) => void;
   updateSource: (over: { row: number; col: number }) => void;
+  updatePath: (path: StateLocation[]) => void;
 }>((set) => {
   return {
     grid: createNewGrid(10, 10),
@@ -75,6 +77,20 @@ export const useGameStore = create<{
     source: { row: 9, col: 9 },
     updateSource(over) {
       set((state) => ({ ...state, source: over }));
+    },
+    updatePath(path) {
+      set((state) => {
+        const grid = state.grid.map((row) =>
+          row.map((item) => ({ ...item, path: false }))
+        );
+        path.forEach((item) => {
+          grid[item.row][item.col].path = true;
+        });
+        return {
+          ...state,
+          grid,
+        };
+      });
     },
   };
 });

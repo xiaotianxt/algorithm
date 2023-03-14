@@ -9,38 +9,25 @@ import { stateOfCell, transform } from "@/utils/three";
 export function SimpleBox({
   state,
   hover,
+  color,
   ...props
-}: ThreeElements["mesh"] & { state: Cell; hover: boolean }) {
+}: ThreeElements["mesh"] & { state: Cell; hover: boolean; color: string }) {
   return (
     <mesh {...props}>
       <boxGeometry args={[0.9, 0.9, 0.9]} />
-      <meshStandardMaterial
-        color={
-          hover
-            ? "hotpink"
-            : state.path
-            ? "ForestGreen"
-            : state.wall
-            ? "crimson"
-            : "darkorange"
-        }
-      />
+      <meshStandardMaterial color={hover ? "hotpink" : color} />
     </mesh>
   );
 }
 
 const AnimatedBox = animated(SimpleBox);
 
-const from = -1,
-  to = 1;
-const ShakingRange = [0, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 1];
-const ShakingInterpolate = [from, to, from, to, from, to, from, 200];
-
 export function Cell({
   rowid,
   colid,
+  color,
   ...props
-}: ThreeElements["mesh"] & { rowid: number; colid: number }) {
+}: ThreeElements["mesh"] & { rowid: number; colid: number; color: string }) {
   const [hover, setHover] = useState(false);
 
   const { update, grid, setOver, active } = useGameStore();
@@ -91,6 +78,7 @@ export function Cell({
         }
       }}
       {...props}
+      color={color}
     />
   );
 }
